@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ANTIGRAViTY 財務導航</title>
   <meta name="description" content="個人財務追蹤與分析工具 — 即時收支管理、回饋計算與智能預警">
   <link
@@ -67,6 +68,10 @@
       min-height: 100vh;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
 
     /* ─── 滾動條 ─── */
@@ -147,6 +152,9 @@
       color: var(--text-primary);
       cursor: pointer;
       transition: var(--transition);
+      min-height: 44px;
+      /* iOS standard touch target size */
+      justify-content: center;
     }
 
     .btn:hover {
@@ -184,8 +192,8 @@
     }
 
     .btn-icon {
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       padding: 0;
       display: flex;
       align-items: center;
@@ -322,7 +330,10 @@
 
     @media (max-width: 900px) {
       .main-layout {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "sidebar"
+          "main";
       }
     }
 
@@ -381,8 +392,8 @@
     .type-toggle label {
       flex: 1;
       text-align: center;
-      padding: 10px;
-      font-size: 13px;
+      padding: 12px;
+      font-size: 14px;
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
@@ -433,6 +444,8 @@
       color: var(--text-primary);
       transition: var(--transition);
       outline: none;
+      min-height: 44px;
+      /* Touch friendly input size */
     }
 
     .form-input:focus,
@@ -660,8 +673,8 @@
     }
 
     .record-delete {
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -671,7 +684,7 @@
       color: var(--text-muted);
       cursor: pointer;
       transition: var(--transition);
-      font-size: 14px;
+      font-size: 16px;
       opacity: 0;
     }
 
@@ -888,6 +901,8 @@
       transition: var(--transition);
       font-size: 14px;
       font-family: inherit;
+      min-width: 44px;
+      min-height: 44px;
     }
 
     .month-nav:hover {
@@ -1179,7 +1194,35 @@
       }
 
       .records-filter {
-        flex-wrap: wrap
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .filter-chip {
+        white-space: nowrap;
+        padding: 8px 16px;
+      }
+
+      .record-delete {
+        opacity: 1;
+        /* Always show delete on mobile */
+      }
+
+      .record-item {
+        flex-wrap: wrap;
+        /* allow wrapping on very small screens */
+      }
+
+      .record-amount {
+        width: 100%;
+        text-align: right;
+        margin-top: 4px;
+      }
+
+      .record-delete {
+        margin-left: auto;
       }
     }
   </style>
