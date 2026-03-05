@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANTIGRAViTY 財務導航</title>
+  <meta name="description" content="個人財務追蹤與分析工具 — 即時收支管理、回饋計算與智能預警">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════
+   ANTIGRAViTY 財務導航 — 設計系統
+   ═══════════════════════════════════════════════════════ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg-primary: #000000;
+      --bg-secondary: #050505;
+      --bg-card: rgba(20, 20, 20, 0.6);
+      --bg-card-hover: rgba(30, 30, 30, 0.8);
+      --bg-input: rgba(255, 255, 255, 0.03);
+      --bg-overlay: rgba(0, 0, 0, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(255, 255, 255, 0.2);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --text-muted: rgba(255, 255, 255, 0.35);
+      --accent: #ffffff;
+      --accent-glow: 0 0 15px rgba(255, 255, 255, 0.3);
+      --income-color: #00ffa3;
+      --income-glow: 0 0 15px rgba(0, 255, 163, 0.4);
+      --income-dim: rgba(0, 255, 163, 0.08);
+      --expense-color: #ff3d71;
+      --expense-glow: 0 0 15px rgba(255, 61, 113, 0.4);
+      --expense-dim: rgba(255, 61, 113, 0.08);
+      --warning-color: #ff9f0a;
+      --warning-dim: rgba(255, 159, 10, 0.12);
+      --info-color: #00e5ff;
+      --info-dim: rgba(0, 229, 255, 0.1);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+      --glass: saturate(180%) blur(15px);
+      --transition: 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── 滾動條 ─── */
+    ::-webkit-scrollbar {
+      width: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 3px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555
+    }
+
+    /* ─── 頂部導航列 ─── */
+    .navbar {
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      margin: 12px 24px;
+      background: rgba(15, 15, 15, 0.6);
+      backdrop-filter: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .navbar-brand .logo {
+      width: 36px;
+      height: 36px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .navbar-actions {
+      display: flex;
+      gap: 8px
+    }
+
+    /* ─── 按鈕 ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-focus)
+    }
+
+    .btn:active {
+      transform: scale(0.97)
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #e0e0e0;
+      border-color: #e0e0e0
+    }
+
+    .btn-danger {
+      border-color: var(--expense-color);
+      color: var(--expense-color)
+    }
+
+    .btn-danger:hover {
+      background: var(--expense-dim)
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    /* ─── 主容器 ─── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ─── 統計卡片區 ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-4px) scale(1.02);
+      background: var(--bg-card-hover);
+    }
+
+    .stat-card.income::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--income-color);
+      box-shadow: var(--income-glow);
+    }
+
+    .stat-card.expense::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--expense-color);
+      box-shadow: var(--expense-glow);
+    }
+
+    .stat-card.balance::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--info-color);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+    }
+
+    .stat-card.warning::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--warning-color);
+      box-shadow: 0 0 15px rgba(255, 159, 10, 0.4);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .stat-value.positive {
+      color: var(--income-color)
+    }
+
+    .stat-value.negative {
+      color: var(--expense-color)
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* ─── 主內容區（雙欄） ─── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      grid-template-areas: "sidebar main";
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Bento Grid Logic */
+    .panel {
+      grid-area: sidebar;
+    }
+
+    .content-area {
+      grid-area: main;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ─── 表單面板 ─── */
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      position: sticky;
+      top: 100px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--income-color);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.4
+      }
+    }
+
+    /* ─── 收入/支出切換 ─── */
+    .type-toggle {
+      display: flex;
+      background: var(--bg-input);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+
+    .type-toggle label {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-secondary);
+    }
+
+    .type-toggle input {
+      display: none
+    }
+
+    .type-toggle input[value="income"]:checked+label {
+      background: var(--income-dim);
+      color: var(--income-color);
+      box-shadow: 0 0 20px rgba(0, 230, 118, 0.1);
+    }
+
+    .type-toggle input[value="expense"]:checked+label {
+      background: var(--expense-dim);
+      color: var(--expense-color);
+      box-shadow: 0 0 20px rgba(255, 82, 82, 0.1);
+    }
+
+    /* ─── 表單元素 ─── */
+    .form-group {
+      margin-bottom: 14px
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted)
+    }
+
+    .form-select option {
+      background: var(--bg-secondary);
+      color: var(--text-primary)
+    }
+
+    .amount-input-wrapper {
+      position: relative;
+    }
+
+    .amount-input-wrapper .currency-prefix {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .amount-input-wrapper .form-input {
+      padding-left: 38px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .submit-btn:hover {
+      background: #e0e0e0;
+      transform: translateY(-1px)
+    }
+
+    .submit-btn:active {
+      transform: translateY(0)
+    }
+
+    /* ─── 記錄列表 ─── */
+    .records-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .records-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .records-header h2 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .records-filter {
+      display: flex;
+      gap: 6px;
+    }
+
+    .filter-chip {
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--border-focus)
+    }
+
+    .filter-chip.active {
+      background: #fff;
+      color: #000;
+      border-color: #fff
+    }
+
+    .records-list {
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .record-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    .record-item:hover {
+      background: var(--bg-card-hover)
+    }
+
+    .record-item:last-child {
+      border-bottom: none
+    }
+
+    .record-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .record-icon.income {
+      background: var(--income-dim);
+      color: var(--income-color)
+    }
+
+    .record-icon.expense {
+      background: var(--expense-dim);
+      color: var(--expense-color)
+    }
+
+    .record-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .record-category {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .record-category .fuel-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      background: var(--warning-dim);
+      color: var(--warning-color);
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .record-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 12px;
+      margin-top: 3px;
+    }
+
+    .record-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .record-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .record-amount.income {
+      color: var(--income-color)
+    }
+
+    .record-amount.expense {
+      color: var(--expense-color)
+    }
+
+    .record-delete {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+      opacity: 0;
+    }
+
+    .record-item:hover .record-delete {
+      opacity: 1
+    }
+
+    .record-delete:hover {
+      background: var(--expense-dim);
+      color: var(--expense-color)
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3
+    }
+
+    .empty-state p {
+      font-size: 14px
+    }
+
+    /* ─── 預警通知 ─── */
+    .alerts-container {
+      margin-bottom: 24px;
+    }
+
+    .alert-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--warning-dim);
+      border: 1px solid rgba(255, 215, 64, 0.2);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      animation: alertPulse 0.5s ease;
+    }
+
+    @keyframes alertPulse {
+      0% {
+        opacity: 0;
+        transform: scale(0.98)
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .alert-bar .alert-icon {
+      font-size: 18px
+    }
+
+    .alert-bar .alert-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--warning-color)
+    }
+
+    .alert-bar .alert-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--warning-color);
+      cursor: pointer;
+      font-size: 16px;
+      opacity: 0.6;
+      transition: var(--transition);
+    }
+
+    .alert-bar .alert-close:hover {
+      opacity: 1
+    }
+
+    /* ─── 加油回饋區 ─── */
+    .fuel-section {
+      margin-top: 24px;
+    }
+
+    .fuel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .fuel-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fuel-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .fuel-stat {
+      background: var(--bg-input);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+
+    .fuel-stat .fs-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .fuel-stat .fs-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--warning-color);
+    }
+
+    .fuel-stat .fs-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ─── Modal ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-overlay);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      transform: scale(0.95);
+      transition: var(--transition);
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1)
+    }
+
+    .modal h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .modal p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end
+    }
+
+    /* ─── 月份選擇 ─── */
+    .month-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .month-nav {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .month-nav:hover {
+      border-color: var(--border-focus)
+    }
+
+    .month-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    /* ─── 頁尾 ─── */
+    .footer {
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* ─── 動畫工具 ─── */
+    .fade-in {
+      animation: fadeIn 0.4s ease
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    /* ─── Toast ─── */
+    .toast-container {
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      padding: 12px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow);
+      animation: toastIn 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.success {
+      border-color: var(--income-color);
+      color: var(--income-color)
+    }
+
+    .toast.error {
+      border-color: var(--expense-color);
+      color: var(--expense-color)
+    }
+
+    .toast.info {
+      border-color: var(--info-color);
+      color: var(--info-color)
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    /* ─── 圖片上傳區 ─── */
+    .photo-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .photo-upload-area:hover {
+      border-color: var(--border-focus);
+      background: var(--accent-dim);
+    }
+
+    .photo-upload-area.has-image {
+      border-style: solid;
+      border-color: var(--info-color);
+      padding: 8px;
+    }
+
+    .photo-upload-area input[type="file"] {
+      display: none;
+    }
+
+    .photo-upload-icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+      opacity: 0.5;
+    }
+
+    .photo-upload-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .photo-upload-text strong {
+      color: var(--text-secondary);
+    }
+
+    .photo-preview-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .photo-preview-thumb {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .photo-preview-info {
+      flex: 1;
+      text-align: left;
+    }
+
+    .photo-preview-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .photo-preview-size {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .photo-remove-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--expense-dim);
+      border: none;
+      border-radius: 6px;
+      color: var(--expense-color);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .photo-remove-btn:hover {
+      background: var(--expense-color);
+      color: #fff;
+    }
+
+    /* 記錄列表中的縮圖 */
+    .record-thumb {
+      width: 36px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .record-thumb:hover {
+      border-color: var(--info-color);
+      box-shadow: 0 0 12px rgba(64, 196, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    /* 圖片預覽 Modal */
+    .image-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 250;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+      cursor: zoom-out;
+    }
+
+    .image-modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .image-modal-overlay img {
+      max-width: 90vw;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      transform: scale(0.95);
+      transition: var(--transition);
+    }
+
+    .image-modal-overlay.show img {
+      transform: scale(1);
+    }
+
+    .image-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .image-modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ─── RWD ─── */
+    @media (max-width: 600px) {
+      .navbar {
+        padding: 12px 16px
+      }
+
+      .container {
+        padding: 16px
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .stat-value {
+        font-size: 22px
+      }
+
+      .panel {
+        position: static;
+      }
+
+      .fuel-stats {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .records-filter {
+        flex-wrap: wrap
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════ 導航列 ═══════════════ -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo">A</div>
+      <span>財務導航</span>
+    </div>
+    <div class="navbar-actions">
+      <div class="month-selector">
+        <button class="month-nav" id="prevMonth" title="上個月">◀</button>
+        <span class="month-label" id="monthLabel"></span>
+        <button class="month-nav" id="nextMonth" title="下個月">▶</button>
+      </div>
+      <button class="btn" id="exportBtn" title="匯出 CSV">📥 匯出</button>
+      <button class="btn btn-danger btn-sm" id="clearAllBtn" title="清除所有資料">🗑</button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════ Toast 容器 ═══════════════ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ═══════════════ 主內容 ═══════════════ -->
+  <div class="container">
+
+    <!-- 預警區 -->
+    <div class="alerts-container" id="alertsContainer"></div>
+
+    <!-- 統計卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card income">
+        <div class="stat-label">本月收入</div>
+        <div class="stat-value positive" id="totalIncome">$0</div>
+        <div class="stat-sub" id="incomeCount">0 筆記錄</div>
+      </div>
+      <div class="stat-card expense">
+        <div class="stat-label">本月支出</div>
+        <div class="stat-value negative" id="totalExpense">$0</div>
+        <div class="stat-sub" id="expenseCount">0 筆記錄</div>
+      </div>
+      <div class="stat-card balance">
+        <div class="stat-label">可用餘額</div>
+        <div class="stat-value" id="balance">$0</div>
+        <div class="stat-sub" id="balanceRatio">收支比 —</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">日均支出</div>
+        <div class="stat-value" id="dailyAvg">$0</div>
+        <div class="stat-sub" id="todaySpend">今日花費 $0</div>
+      </div>
+    </div>
+
+    <!-- 雙欄：表單 + 記錄列表 -->
+    <div class="main-layout">
+
+      <!-- 左側：輸入面板 -->
+      <div class="panel">
+        <div class="panel-title"><span class="dot"></span> 新增記錄</div>
+
+        <form id="recordForm" autocomplete="off">
+          <!-- 收入/支出切換 -->
+          <div class="type-toggle">
+            <input type="radio" name="type" value="income" id="typeIncome">
+            <label for="typeIncome">💰 收入</label>
+            <input type="radio" name="type" value="expense" id="typeExpense" checked>
+            <label for="typeExpense">💸 支出</label>
+          </div>
+
+          <!-- 類別 -->
+          <div class="form-group">
+            <label class="form-label" for="category">類別</label>
+            <select class="form-select" id="category" required>
+              <optgroup label="支出類別" id="expenseCategories">
+                <option value="加油">⛽ 加油</option>
+                <option value="餐飲">🍜 餐飲</option>
+                <option value="固定帳單">📋 固定帳單</option>
+                <option value="交通">🚗 交通</option>
+                <option value="娛樂">🎮 娛樂</option>
+                <option value="購物">🛍️ 購物</option>
+                <option value="醫療">🏥 醫療</option>
+                <option value="教育">📚 教育</option>
+                <option value="其他支出">📌 其他</option>
+              </optgroup>
+              <optgroup label="收入類別" id="incomeCategories">
+                <option value="薪資">💼 薪資</option>
+                <option value="投資">📈 投資</option>
+                <option value="獎金">🏆 獎金</option>
+                <option value="副業">🔧 副業</option>
+                <option value="其他收入">💡 其他</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- 金額 -->
+          <div class="form-group">
+            <label class="form-label" for="amount">金額</label>
+            <div class="amount-input-wrapper">
+              <span class="currency-prefix">NT$</span>
+              <input type="number" class="form-input" id="amount" placeholder="0" min="1" step="1" required>
+            </div>
+          </div>
+
+          <!-- 付款方式 -->
+          <div class="form-group">
+            <label class="form-label" for="payment">付款方式</label>
+            <select class="form-select" id="payment">
+              <option value="現金">💵 現金</option>
+              <option value="玉山 Unicard">💳 玉山 Unicard</option>
+              <option value="Pi 卡">💳 Pi 卡</option>
+              <option value="LINE Pay">💳 LINE Pay</option>
+              <option value="街口支付">📱 街口支付</option>
+              <option value="Apple Pay">📱 Apple Pay</option>
+              <option value="轉帳">🏦 轉帳</option>
+              <option value="其他">📎 其他</option>
+            </select>
+          </div>
+
+          <!-- 備註 -->
+          <div class="form-group">
+            <label class="form-label" for="note">備註（選填）</label>
+            <input type="text" class="form-input" id="note" placeholder="輸入備註..." maxlength="50">
+          </div>
+
+          <!-- 日期 -->
+          <div class="form-group">
+            <label class="form-label" for="date">日期</label>
+            <input type="date" class="form-input" id="date" required>
+          </div>
+
+          <!-- 單據圖片 -->
+          <div class="form-group">
+            <label class="form-label">單據照片（選填）</label>
+            <div class="photo-upload-area" id="photoUploadArea">
+              <input type="file" id="receiptPhoto" accept="image/*" capture="environment">
+              <div id="photoPlaceholder">
+                <div class="photo-upload-icon">📸</div>
+                <div class="photo-upload-text"><strong>點擊拍照</strong>或選擇圖片<br>支援 JPG、PNG（自動壓縮）</div>
+              </div>
+              <div id="photoPreview" style="display:none">
+                <div class="photo-preview-container">
+                  <img class="photo-preview-thumb" id="photoPreviewImg" src="" alt="預覽">
+                  <div class="photo-preview-info">
+                    <div class="photo-preview-name" id="photoFileName"></div>
+                    <div class="photo-preview-size" id="photoFileSize"></div>
+                  </div>
+                  <button type="button" class="photo-remove-btn" id="photoRemoveBtn" title="移除圖片">✕</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">＋ 新增記錄</button>
+        </form>
+      </div>
+
+      <!-- 右側：內容區塊 (Bento Main) -->
+      <div class="content-area">
+        <div class="records-panel">
+          <div class="records-header">
+            <h2>📋 交易紀錄</h2>
+            <div class="records-filter">
+              <button class="filter-chip active" data-filter="all">全部</button>
+              <button class="filter-chip" data-filter="income">收入</button>
+              <button class="filter-chip" data-filter="expense">支出</button>
+              <button class="filter-chip" data-filter="加油">加油</button>
+            </div>
+          </div>
+          <div class="records-list" id="recordsList"></div>
+        </div>
+
+        <!-- 加油回饋追蹤 -->
+        <div class="fuel-section">
+          <div class="fuel-card">
+            <div class="fuel-card-title">⛽ 加油回饋追蹤</div>
+            <div class="fuel-stats">
+              <div class="fuel-stat">
+                <div class="fs-label">本月加油總額</div>
+                <div class="fs-value" id="fuelTotal">$0</div>
+              </div>
+              <div class="fuel-stat">
+                <div class="fs-label">預估回饋</div>
+                <div class="fs-value" id="fuelReward">$0</div>
+                <div class="fs-sub" id="fuelRewardDetail">—</div>
+              </div>
+              <div class="fuel-stat">
+                <div class="fs-label">加油次數</div>
+                <div class="fs-value" id="fuelCount">0</div>
+              </div>
+              <div class="fuel-stat">
+                <div class="fs-label">主要付款方式</div>
+                <div class="fs-value" id="fuelPayment" style="font-size:14px">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ 確認清除 Modal ═══════════════ -->
+  <div class="modal-overlay" id="clearModal">
+    <div class="modal">
+      <h3>⚠️ 確認清除全部</h3>
+      <p>此操作將永久刪除所有財務記錄與單據圖片，無法復原。確定要繼續嗎？</p>
+      <div class="modal-actions">
+        <button class="btn" id="cancelClear">取消</button>
+        <button class="btn btn-danger" id="confirmClear">確認清除全部</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 刪除單筆確認 Modal ═══════════════ -->
+  <div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal">
+      <h3>❌ 刪除紀錄</h3>
+      <p>確定要刪除這筆交易紀錄嗎？對應的單據圖片也將同步移除。</p>
+      <div class="modal-actions">
+        <button class="btn" id="cancelDeleteBtn">返回</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">確認刪除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 圖片預覽 Modal ═══════════════ -->
+  <div class="image-modal-overlay" id="imageModal">
+    <button class="image-modal-close" id="imageModalClose">✕</button>
+    <img id="imageModalImg" src="" alt="單據照片">
+  </div>
+
+  <footer class="footer">
+    ANTIGRAViTY FINANCE NAVIGATOR — 本地運行 · 資料安全
+  </footer>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════
+       ANTIGRAViTY 財務導航 — 核心邏輯
+       ═══════════════════════════════════════════════════════ */
+
+    // ─── 全域狀態 ─── 
+    const STORAGE_KEY = 'antigravity_finance_records';
+    const IMG_DB_NAME = 'antigravity_finance_images';
+    const IMG_DB_VERSION = 1;
+    let currentMonth = new Date();
+    let activeFilter = 'all';
+    let pendingImageData = null; // 暫存待上傳的圖片 base64
+
+    // ─── 卡片回饋率設定（加油類別） ─── 
+    const FUEL_REWARD_RATES = {
+      '玉山 Unicard': { rate: 0.038, label: '3.8% 回饋' },
+      'Pi 卡': { rate: 0.025, label: '2.5% 回饋' },
+      'LINE Pay': { rate: 0.02, label: '2% 回饋' },
+      '街口支付': { rate: 0.015, label: '1.5% 回饋' },
+      '現金': { rate: 0, label: '無回饋' },
+      'Apple Pay': { rate: 0.01, label: '1% 回饋' },
+      '轉帳': { rate: 0, label: '無回饋' },
+      '其他': { rate: 0, label: '—' }
+    };
+
+    // ─── 類別圖示映射 ─── 
+    const CATEGORY_ICONS = {
+      '加油': '⛽', '餐飲': '🍜', '固定帳單': '📋', '交通': '🚗',
+      '娛樂': '🎮', '購物': '🛍️', '醫療': '🏥', '教育': '📚', '其他支出': '📌',
+      '薪資': '💼', '投資': '📈', '獎金': '🏆', '副業': '🔧', '其他收入': '💡'
+    };
+
+    // ═══════════════ IndexedDB 圖片存儲 ═══════════════ 
+    function openImageDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(IMG_DB_NAME, IMG_DB_VERSION);
+        req.onupgradeneeded = e => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('images')) {
+            db.createObjectStore('images', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e.target.error);
+      });
+    }
+
+    async function saveImage(id, dataUrl) {
+      const db = await openImageDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('images', 'readwrite');
+        tx.objectStore('images').put({ id, dataUrl });
+        tx.oncomplete = () => resolve();
+        tx.onerror = e => reject(e.target.error);
+      });
+    }
+
+    async function getImage(id) {
+      const db = await openImageDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('images', 'readonly');
+        const req = tx.objectStore('images').get(id);
+        req.onsuccess = () => resolve(req.result?.dataUrl || null);
+        req.onerror = e => reject(e.target.error);
+      });
+    }
+
+    async function deleteImage(id) {
+      const db = await openImageDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('images', 'readwrite');
+        tx.objectStore('images').delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = e => reject(e.target.error);
+      });
+    }
+
+    async function clearAllImages() {
+      const db = await openImageDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('images', 'readwrite');
+        tx.objectStore('images').clear();
+        tx.oncomplete = () => resolve();
+        tx.onerror = e => reject(e.target.error);
+      });
+    }
+
+    // ═══════════════ 圖片壓縮 ═══════════════ 
+    function compressImage(file, maxWidth = 1200, quality = 0.7) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxWidth) {
+              h = Math.round(h * maxWidth / w);
+              w = maxWidth;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ═══════════════ 資料存取 ═══════════════ 
+    function loadRecords() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch { return []; }
+    }
+
+    function saveRecords(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function addRecord(record) {
+      const records = loadRecords();
+      record.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+      record.createdAt = new Date().toISOString();
+      records.unshift(record);
+      saveRecords(records);
+      return record;
+    }
+
+    function deleteRecord(id) {
+      const records = loadRecords().filter(r => r.id !== id);
+      saveRecords(records);
+      // 同時刪除關聯的圖片
+      deleteImage(id).catch(() => { });
+    }
+
+    // ═══════════════ 月份篩選 ═══════════════ 
+    function getMonthRecords() {
+      const records = loadRecords();
+      const y = currentMonth.getFullYear();
+      const m = currentMonth.getMonth();
+      return records.filter(r => {
+        const d = new Date(r.date);
+        return d.getFullYear() === y && d.getMonth() === m;
+      });
+    }
+
+    function updateMonthLabel() {
+      const y = currentMonth.getFullYear();
+      const m = String(currentMonth.getMonth() + 1).padStart(2, '0');
+      document.getElementById('monthLabel').textContent = `${y}.${m}`;
+    }
+
+    // ═══════════════ 統計計算 ═══════════════ 
+    function computeStats(records) {
+      let totalIncome = 0, totalExpense = 0;
+      let incomeCount = 0, expenseCount = 0;
+      const today = new Date().toISOString().slice(0, 10);
+      let todayExpense = 0;
+      const fuelRecords = [];
+
+      records.forEach(r => {
+        const amt = Number(r.amount);
+        if (r.type === 'income') { totalIncome += amt; incomeCount++; }
+        else { totalExpense += amt; expenseCount++; }
+        if (r.type === 'expense' && r.date === today) todayExpense += amt;
+        if (r.category === '加油') fuelRecords.push(r);
+      });
+
+      // 日均支出（以本月到今天的天數計算）
+      const now = new Date();
+      const y = currentMonth.getFullYear();
+      const m = currentMonth.getMonth();
+      let daysElapsed;
+      if (y === now.getFullYear() && m === now.getMonth()) {
+        daysElapsed = now.getDate();
+      } else {
+        daysElapsed = new Date(y, m + 1, 0).getDate();
+      }
+      const dailyAvg = daysElapsed > 0 ? totalExpense / daysElapsed : 0;
+
+      return {
+        totalIncome, totalExpense,
+        incomeCount, expenseCount,
+        balance: totalIncome - totalExpense,
+        dailyAvg, todayExpense,
+        fuelRecords
+      };
+    }
+
+    // ═══════════════ 加油回饋計算 ═══════════════ 
+    function computeFuelRewards(fuelRecords) {
+      let totalFuel = 0, totalReward = 0;
+      const paymentCount = {};
+
+      fuelRecords.forEach(r => {
+        const amt = Number(r.amount);
+        totalFuel += amt;
+        const rate = FUEL_REWARD_RATES[r.payment]?.rate || 0;
+        totalReward += amt * rate;
+        paymentCount[r.payment] = (paymentCount[r.payment] || 0) + 1;
+      });
+
+      let topPayment = '—';
+      let topCount = 0;
+      Object.entries(paymentCount).forEach(([k, v]) => {
+        if (v > topCount) { topCount = v; topPayment = k; }
+      });
+
+      // 回饋明細
+      const detailParts = [];
+      const byPayment = {};
+      fuelRecords.forEach(r => {
+        if (!byPayment[r.payment]) byPayment[r.payment] = 0;
+        byPayment[r.payment] += Number(r.amount);
+      });
+      Object.entries(byPayment).forEach(([pay, sum]) => {
+        const info = FUEL_REWARD_RATES[pay];
+        if (info && info.rate > 0) {
+          detailParts.push(`${pay}: $${Math.round(sum * info.rate)}`);
+        }
+      });
+
+      return {
+        totalFuel, totalReward, count: fuelRecords.length,
+        topPayment,
+        detail: detailParts.length > 0 ? detailParts.join(' / ') : '無回饋'
+      };
+    }
+
+    // ═══════════════ 預警系統 ═══════════════ 
+    function checkAlerts(stats) {
+      const alerts = [];
+      const { todayExpense, dailyAvg } = stats;
+
+      if (dailyAvg > 0 && todayExpense > dailyAvg * 1.5) {
+        alerts.push({
+          type: 'warning',
+          text: `⚡ 今日支出 $${todayExpense.toLocaleString()} 已超過日均支出 $${Math.round(dailyAvg).toLocaleString()} 的 1.5 倍，請留意預算！`
+        });
+      }
+
+      if (stats.balance < 0) {
+        alerts.push({
+          type: 'danger',
+          text: `🚨 本月支出已超過收入 $${Math.abs(stats.balance).toLocaleString()}，請審視開支計畫。`
+        });
+      }
+
+      const ratio = stats.totalIncome > 0 ? (stats.totalExpense / stats.totalIncome) : 0;
+      if (ratio > 0.8 && ratio <= 1) {
+        alerts.push({
+          type: 'caution',
+          text: `⚠️ 收支比達 ${(ratio * 100).toFixed(0)}%，已接近警戒線。建議控制非必要開支。`
+        });
+      }
+
+      return alerts;
+    }
+
+    // ═══════════════ 渲染函式 ═══════════════ 
+    function formatMoney(n) {
+      return '$' + Math.abs(n).toLocaleString('zh-TW');
+    }
+
+    function renderStats() {
+      const records = getMonthRecords();
+      const stats = computeStats(records);
+
+      document.getElementById('totalIncome').textContent = formatMoney(stats.totalIncome);
+      document.getElementById('totalExpense').textContent = formatMoney(stats.totalExpense);
+      document.getElementById('incomeCount').textContent = `${stats.incomeCount} 筆記錄`;
+      document.getElementById('expenseCount').textContent = `${stats.expenseCount} 筆記錄`;
+
+      const balEl = document.getElementById('balance');
+      balEl.textContent = (stats.balance >= 0 ? '' : '-') + formatMoney(stats.balance);
+      balEl.className = 'stat-value ' + (stats.balance >= 0 ? 'positive' : 'negative');
+
+      const ratioText = stats.totalIncome > 0
+        ? `收支比 ${((stats.totalExpense / stats.totalIncome) * 100).toFixed(1)}%`
+        : '收支比 —';
+      document.getElementById('balanceRatio').textContent = ratioText;
+
+      document.getElementById('dailyAvg').textContent = formatMoney(Math.round(stats.dailyAvg));
+      document.getElementById('todaySpend').textContent = `今日花費 ${formatMoney(stats.todayExpense)}`;
+
+      // 加油回饋
+      const fuel = computeFuelRewards(stats.fuelRecords);
+      document.getElementById('fuelTotal').textContent = formatMoney(fuel.totalFuel);
+      document.getElementById('fuelReward').textContent = formatMoney(Math.round(fuel.totalReward));
+      document.getElementById('fuelRewardDetail').textContent = fuel.detail;
+      document.getElementById('fuelCount').textContent = fuel.count;
+      document.getElementById('fuelPayment').textContent = fuel.topPayment;
+
+      // 預警
+      renderAlerts(stats);
+    }
+
+    function renderAlerts(stats) {
+      const container = document.getElementById('alertsContainer');
+      const alerts = checkAlerts(stats);
+      container.innerHTML = alerts.map(a => `
+    <div class="alert-bar">
+      <span class="alert-icon">${a.type === 'danger' ? '🚨' : '⚠️'}</span>
+      <span class="alert-text">${a.text}</span>
+      <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
+    </div>
+  `).join('');
+    }
+
+    function renderRecords() {
+      const records = getMonthRecords();
+      const list = document.getElementById('recordsList');
+
+      let filtered = records;
+      if (activeFilter === 'income') filtered = records.filter(r => r.type === 'income');
+      else if (activeFilter === 'expense') filtered = records.filter(r => r.type === 'expense');
+      else if (activeFilter === '加油') filtered = records.filter(r => r.category === '加油');
+
+      // 按日期排序（最新在上）
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date) || b.createdAt?.localeCompare(a.createdAt));
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>${activeFilter === 'all' ? '本月尚無記錄，點擊左側新增' : '此篩選下無記錄'}</p>
+      </div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(r => {
+        const icon = CATEGORY_ICONS[r.category] || '📌';
+        const isFuel = r.category === '加油';
+        const amtClass = r.type === 'income' ? 'income' : 'expense';
+        const prefix = r.type === 'income' ? '+' : '-';
+        const hasImage = r.hasImage;
+        return `
+      <div class="record-item" data-id="${r.id}">
+        <div class="record-icon ${amtClass}">${icon}</div>
+        <div class="record-info">
+          <div class="record-category">
+            ${r.category}
+            ${isFuel ? '<span class="fuel-badge">FUEL</span>' : ''}
+            ${hasImage ? '<span class="fuel-badge" style="background:var(--info-dim);color:var(--info-color)">📷</span>' : ''}
+          </div>
+          <div class="record-meta">
+            <span>${r.date}</span>
+            <span>${r.payment}</span>
+          </div>
+          ${r.note ? `<div class="record-note">${escapeHtml(r.note)}</div>` : ''}
+        </div>
+        ${hasImage ? `<img class="record-thumb" data-record-id="${r.id}" src="" alt="單據" onclick="showRecordImage('${r.id}')" loading="lazy">` : ''}
+        <div class="record-amount ${amtClass}">${prefix}${formatMoney(r.amount)}</div>
+        <button class="record-delete" onclick="handleDelete('${r.id}')" title="刪除">✕</button>
+      </div>`;
+      }).join('');
+
+      // 非同步載入縮圖
+      loadRecordThumbnails();
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ═══════════════ 圖片相關事件與函式 ═══════════════ 
+
+    // 圖片上傳區點擊
+    document.getElementById('photoUploadArea').addEventListener('click', e => {
+      if (e.target.closest('.photo-remove-btn')) return;
+      document.getElementById('receiptPhoto').click();
+    });
+
+    // 圖片選擇後壓縮並預覽
+    document.getElementById('receiptPhoto').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      showToast('正在壓縮圖片...', 'info');
+      try {
+        const compressed = await compressImage(file);
+        pendingImageData = compressed;
+
+        // 顯示預覽
+        document.getElementById('photoPlaceholder').style.display = 'none';
+        document.getElementById('photoPreview').style.display = 'block';
+        document.getElementById('photoPreviewImg').src = compressed;
+        document.getElementById('photoFileName').textContent = file.name;
+        const sizeKB = Math.round(compressed.length * 0.75 / 1024);
+        document.getElementById('photoFileSize').textContent = `壓縮後 ~${sizeKB} KB`;
+        document.getElementById('photoUploadArea').classList.add('has-image');
+        showToast('圖片已準備就緒', 'success');
+      } catch {
+        showToast('圖片處理失敗', 'error');
+      }
+    });
+
+    // 移除圖片
+    document.getElementById('photoRemoveBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      clearPendingImage();
+    });
+
+    function clearPendingImage() {
+      pendingImageData = null;
+      document.getElementById('receiptPhoto').value = '';
+      document.getElementById('photoPlaceholder').style.display = '';
+      document.getElementById('photoPreview').style.display = 'none';
+      document.getElementById('photoUploadArea').classList.remove('has-image');
+    }
+
+    // 顯示記錄的單據圖片
+    async function showRecordImage(recordId) {
+      try {
+        const dataUrl = await getImage(recordId);
+        if (dataUrl) {
+          document.getElementById('imageModalImg').src = dataUrl;
+          document.getElementById('imageModal').classList.add('show');
+        } else {
+          showToast('找不到此單據圖片', 'error');
+        }
+      } catch {
+        showToast('載入圖片失敗', 'error');
+      }
+    }
+
+    // 圖片 Modal 關閉
+    document.getElementById('imageModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget || e.target.id === 'imageModalClose') {
+        document.getElementById('imageModal').classList.remove('show');
+      }
+    });
+    document.getElementById('imageModalClose').addEventListener('click', () => {
+      document.getElementById('imageModal').classList.remove('show');
+    });
+
+    // 非同步載入記錄列表中的縮圖
+    async function loadRecordThumbnails() {
+      const thumbs = document.querySelectorAll('.record-thumb');
+      for (const thumb of thumbs) {
+        const rid = thumb.dataset.recordId;
+        try {
+          const dataUrl = await getImage(rid);
+          if (dataUrl) thumb.src = dataUrl;
+        } catch { }
+      }
+    }
+
+    // ═══════════════ 事件處理 ═══════════════ 
+    // 表單提交
+    document.getElementById('recordForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const type = document.querySelector('input[name="type"]:checked').value;
+      const category = document.getElementById('category').value;
+      const amount = Number(document.getElementById('amount').value);
+      const payment = document.getElementById('payment').value;
+      const note = document.getElementById('note').value.trim();
+      const date = document.getElementById('date').value;
+
+      if (!amount || amount <= 0) {
+        showToast('請輸入有效金額', 'error');
+        return;
+      }
+
+      const hasImage = !!pendingImageData;
+      const record = addRecord({ type, category, amount, payment, note, date, hasImage });
+
+      // 如果有圖片，存入 IndexedDB
+      if (pendingImageData) {
+        try {
+          await saveImage(record.id, pendingImageData);
+        } catch {
+          showToast('圖片儲存失敗', 'error');
+        }
+        clearPendingImage();
+      }
+
+      showToast(`${type === 'income' ? '收入' : '支出'}記錄已新增${hasImage ? '（含單據）' : ''}`, 'success');
+
+      // 重置表單（保留類型與日期）
+      document.getElementById('amount').value = '';
+      document.getElementById('note').value = '';
+
+      renderAll();
+    });
+
+    // 類別切換：根據收入/支出顯示對應類別
+    document.querySelectorAll('input[name="type"]').forEach(input => {
+      input.addEventListener('change', () => {
+        const isIncome = input.value === 'income';
+        document.getElementById('expenseCategories').style.display = isIncome ? 'none' : '';
+        document.getElementById('incomeCategories').style.display = isIncome ? '' : 'none';
+        // 自動選到第一個可見選項
+        const select = document.getElementById('category');
+        const options = select.querySelectorAll(`optgroup[id="${isIncome ? 'incomeCategories' : 'expenseCategories'}"] option`);
+        if (options.length > 0) select.value = options[0].value;
+      });
+    });
+
+    // 篩選器
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeFilter = chip.dataset.filter;
+        renderRecords();
+      });
+    });
+
+    // 月份切換
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      currentMonth.setMonth(currentMonth.getMonth() - 1);
+      updateMonthLabel();
+      renderAll();
+    });
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      currentMonth.setMonth(currentMonth.getMonth() + 1);
+      updateMonthLabel();
+      renderAll();
+    });
+
+    // 刪除記錄 (兩階段確認)
+    let recordIdToDelete = null;
+
+    function handleDelete(id) {
+      recordIdToDelete = id;
+      document.getElementById('deleteConfirmModal').classList.add('show');
+    }
+
+    document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+      recordIdToDelete = null;
+      document.getElementById('deleteConfirmModal').classList.remove('show');
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+      if (recordIdToDelete) {
+        deleteRecord(recordIdToDelete);
+        showToast('記錄與關聯單據已移除', 'info');
+        renderAll();
+      }
+      recordIdToDelete = null;
+      document.getElementById('deleteConfirmModal').classList.remove('show');
+    });
+
+    // 點擊 Overlay 關閉
+    document.getElementById('deleteConfirmModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+    });
+
+    // 清除全部
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+      document.getElementById('clearModal').classList.add('show');
+    });
+    document.getElementById('cancelClear').addEventListener('click', () => {
+      document.getElementById('clearModal').classList.remove('show');
+    });
+    document.getElementById('confirmClear').addEventListener('click', async () => {
+      localStorage.removeItem(STORAGE_KEY);
+      await clearAllImages().catch(() => { });
+      document.getElementById('clearModal').classList.remove('show');
+      showToast('所有記錄與圖片已清除', 'info');
+      renderAll();
+    });
+    document.getElementById('clearModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+    });
+
+    // ═══════════════ CSV 匯出 ═══════════════ 
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const records = getMonthRecords();
+      if (records.length === 0) {
+        showToast('本月無記錄可匯出', 'error');
+        return;
+      }
+
+      const BOM = '\uFEFF';
+      const header = '日期,類型,類別,金額,付款方式,備註\n';
+      const rows = records.map(r =>
+        `${r.date},${r.type === 'income' ? '收入' : '支出'},${r.category},${r.amount},${r.payment},"${(r.note || '').replace(/"/g, '""')}"`
+      ).join('\n');
+
+      const blob = new Blob([BOM + header + rows], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const y = currentMonth.getFullYear();
+      const m = String(currentMonth.getMonth() + 1).padStart(2, '0');
+      a.href = url;
+      a.download = `財務記錄_${y}${m}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV 已下載', 'success');
+    });
+
+    // ═══════════════ Toast ═══════════════ 
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      const icons = { success: '✓', error: '✗', info: 'ℹ' };
+      toast.innerHTML = `<span>${icons[type] || 'ℹ'}</span> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // ═══════════════ 初始化 ═══════════════ 
+    function renderAll() {
+      renderStats();
+      renderRecords();
+    }
+
+    function init() {
+      // 設定今天日期
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('date').value = today;
+
+      // 預設隱藏收入類別
+      document.getElementById('incomeCategories').style.display = 'none';
+
+      updateMonthLabel();
+      renderAll();
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
