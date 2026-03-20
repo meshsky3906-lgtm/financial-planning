@@ -429,6 +429,12 @@
       box-shadow: 0 0 20px rgba(255, 82, 82, 0.1);
     }
 
+    .type-toggle input[value="transfer"]:checked+label {
+      background: var(--info-dim);
+      color: var(--info-color);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+    }
+
     /* ─── 表單元素 ─── */
     .form-group {
       margin-bottom: 14px
@@ -1179,6 +1185,167 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
+    /* ─── 帳戶總覽區 ─── */
+    .accounts-section {
+      margin-bottom: 24px;
+    }
+
+    .accounts-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .accounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .account-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .account-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-2px);
+    }
+
+    .account-card .acc-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .account-card .acc-name {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .account-card .acc-balance {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .account-card .acc-balance.positive {
+      color: var(--income-color);
+    }
+
+    .account-card .acc-balance.negative {
+      color: var(--expense-color);
+    }
+
+    .account-card .acc-balance.zero {
+      color: var(--text-secondary);
+    }
+
+    /* ─── 日期分組標題 ─── */
+    .date-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .date-group-header .dg-date {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
+
+    .date-group-header .dg-weekday {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    .date-group-header .dg-summary {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      gap: 12px;
+    }
+
+    .date-group-header .dg-summary .dg-income {
+      color: var(--income-color);
+    }
+
+    .date-group-header .dg-summary .dg-expense {
+      color: var(--expense-color);
+    }
+
+    /* ─── 轉帳表單欄位 ─── */
+    .transfer-fields {
+      display: none;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .transfer-fields.show {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
+    }
+
+    .transfer-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--text-muted);
+      padding-bottom: 12px;
+    }
+
+    /* ─── 負額餘額警示 ─── */
+    .stat-card.negative-balance {
+      border-color: rgba(255, 61, 113, 0.4) !important;
+      box-shadow: 0 0 20px rgba(255, 61, 113, 0.15), inset 0 0 30px rgba(255, 61, 113, 0.03);
+    }
+
+    .stat-card.negative-balance::after {
+      background: var(--expense-color) !important;
+      box-shadow: var(--expense-glow) !important;
+    }
+
+    /* ─── 類別 optgroup 動態隱藏 ─── */
+    select option[data-hidden="true"] {
+      display: none;
+    }
+
+    /* ─── 轉帳記錄樣式 ─── */
+    .record-icon.transfer {
+      background: rgba(0, 229, 255, 0.08);
+      color: var(--info-color);
+    }
+
+    .record-amount.transfer {
+      color: var(--info-color);
+    }
+
     /* ─── RWD ─── */
     @media (max-width: 600px) {
       .navbar {
@@ -1190,11 +1357,15 @@
       }
 
       .stats-grid {
-        grid-template-columns: 1fr 1fr
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card {
+        padding: 16px 20px;
       }
 
       .stat-value {
-        font-size: 22px
+        font-size: 24px
       }
 
       .panel {
@@ -1203,6 +1374,10 @@
 
       .fuel-stats {
         grid-template-columns: 1fr 1fr
+      }
+
+      .accounts-grid {
+        grid-template-columns: 1fr 1fr;
       }
 
       .records-filter {
@@ -1219,12 +1394,10 @@
 
       .record-delete {
         opacity: 1;
-        /* Always show delete on mobile */
       }
 
       .record-item {
         flex-wrap: wrap;
-        /* allow wrapping on very small screens */
       }
 
       .record-amount {
@@ -1235,6 +1408,15 @@
 
       .record-delete {
         margin-left: auto;
+      }
+
+      .transfer-fields.show {
+        grid-template-columns: 1fr;
+      }
+
+      .transfer-arrow {
+        transform: rotate(90deg);
+        padding: 4px 0;
       }
     }
   </style>
@@ -1274,6 +1456,12 @@
     <!-- 預警區 -->
     <div class="alerts-container" id="alertsContainer"></div>
 
+    <!-- 帳戶總覽 -->
+    <div class="accounts-section" id="accountsSection">
+      <div class="accounts-section-title">🏦 帳戶總覽</div>
+      <div class="accounts-grid" id="accountsGrid"></div>
+    </div>
+
     <!-- 統計卡片 -->
     <div class="stats-grid">
       <div class="stat-card income">
@@ -1286,7 +1474,7 @@
         <div class="stat-value negative" id="totalExpense">$0</div>
         <div class="stat-sub" id="expenseCount">0 筆記錄</div>
       </div>
-      <div class="stat-card balance">
+      <div class="stat-card balance" id="balanceCard">
         <div class="stat-label">可用餘額</div>
         <div class="stat-value" id="balance">$0</div>
         <div class="stat-sub" id="balanceRatio">收支比 —</div>
@@ -1306,21 +1494,23 @@
         <div class="panel-title"><span class="dot"></span> 新增記錄</div>
 
         <form id="recordForm" autocomplete="off">
-          <!-- 收入/支出切換 -->
+          <!-- 收入/支出/轉帳切換 -->
           <div class="type-toggle">
             <input type="radio" name="type" value="income" id="typeIncome">
             <label for="typeIncome">💰 收入</label>
             <input type="radio" name="type" value="expense" id="typeExpense" checked>
             <label for="typeExpense">💸 支出</label>
+            <input type="radio" name="type" value="transfer" id="typeTransfer">
+            <label for="typeTransfer">⇔ 轉帳</label>
           </div>
 
           <!-- 類別 -->
-          <div class="form-group">
+          <div class="form-group" id="categoryGroup">
             <label class="form-label" for="category">類別</label>
             <select class="form-select" id="category" required>
               <optgroup label="支出類別" id="expenseCategories">
-                <option value="加油">⛽ 加油</option>
                 <option value="餐飲">🍜 餐飲</option>
+                <option value="加油">⛽ 加油</option>
                 <option value="固定帳單">📋 固定帳單</option>
                 <option value="交通">🚗 交通</option>
                 <option value="娛樂">🎮 娛樂</option>
@@ -1337,6 +1527,19 @@
                 <option value="其他收入">💡 其他</option>
               </optgroup>
             </select>
+          </div>
+
+          <!-- 轉帳專用欄位 -->
+          <div class="transfer-fields" id="transferFields">
+            <div class="form-group">
+              <label class="form-label" for="fromAccount">從</label>
+              <select class="form-select" id="fromAccount"></select>
+            </div>
+            <div class="transfer-arrow">➡</div>
+            <div class="form-group">
+              <label class="form-label" for="toAccount">至</label>
+              <select class="form-select" id="toAccount"></select>
+            </div>
           </div>
 
           <!-- 金額 -->
@@ -1487,11 +1690,28 @@
 
     // ─── 全域狀態 ─── 
     const STORAGE_KEY = 'antigravity_finance_records';
+    const ACCOUNTS_KEY = 'antigravity_finance_accounts';
     const IMG_DB_NAME = 'antigravity_finance_images';
     const IMG_DB_VERSION = 1;
     let currentMonth = new Date();
     let activeFilter = 'all';
-    let pendingImageData = null; // 暫存待上傳的圖片 base64
+    let pendingImageData = null;
+
+    // ─── 帳戶定義 ─── 
+    const DEFAULT_ACCOUNTS = [
+      { id: 'cash', name: '現金', icon: '💵', initialBalance: 0 },
+      { id: 'esun_unicard', name: '玉山 Unicard', icon: '💳', initialBalance: 0 },
+      { id: 'pi_card', name: 'Pi 卡', icon: '💳', initialBalance: 0 },
+      { id: 'line_pay', name: 'LINE Pay', icon: '💳', initialBalance: 0 },
+      { id: 'jko_pay', name: '街口支付', icon: '📱', initialBalance: 0 },
+      { id: 'apple_pay', name: 'Apple Pay', icon: '📱', initialBalance: 0 },
+      { id: 'bank_transfer', name: '轉帳', icon: '🏦', initialBalance: 0 },
+      { id: 'other', name: '其他', icon: '📎', initialBalance: 0 }
+    ];
+
+    // 帳戶名稱 -> id 映射
+    const ACCOUNT_NAME_TO_ID = {};
+    DEFAULT_ACCOUNTS.forEach(a => ACCOUNT_NAME_TO_ID[a.name] = a.id);
 
     // ─── 卡片回饋率設定（加油類別） ─── 
     const FUEL_REWARD_RATES = {
@@ -1507,10 +1727,14 @@
 
     // ─── 類別圖示映射 ─── 
     const CATEGORY_ICONS = {
-      '加油': '⛽', '餐飲': '🍜', '固定帳單': '📋', '交通': '🚗',
+      '餐飲': '🍜', '加油': '⛽', '固定帳單': '📋', '交通': '🚗',
       '娛樂': '🎮', '購物': '🛍️', '醫療': '🏥', '教育': '📚', '其他支出': '📌',
-      '薪資': '💼', '投資': '📈', '獎金': '🏆', '副業': '🔧', '其他收入': '💡'
+      '薪資': '💼', '投資': '📈', '獎金': '🏆', '副業': '🔧', '其他收入': '💡',
+      '轉帳': '↔️'
     };
+
+    // ─── 星期名稱 ─── 
+    const WEEKDAYS = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
 
     // ═══════════════ IndexedDB 圖片存儲 ═══════════════ 
     function openImageDB() {
@@ -1648,12 +1872,12 @@
       records.forEach(r => {
         const amt = Number(r.amount);
         if (r.type === 'income') { totalIncome += amt; incomeCount++; }
-        else { totalExpense += amt; expenseCount++; }
+        else if (r.type === 'expense') { totalExpense += amt; expenseCount++; }
+        // transfer 不計入收支
         if (r.type === 'expense' && r.date === today) todayExpense += amt;
         if (r.category === '加油') fuelRecords.push(r);
       });
 
-      // 日均支出（以本月到今天的天數計算）
       const now = new Date();
       const y = currentMonth.getFullYear();
       const m = currentMonth.getMonth();
@@ -1672,6 +1896,32 @@
         dailyAvg, todayExpense,
         fuelRecords
       };
+    }
+
+    // ═══════════════ 帳戶餘額計算 ═══════════════ 
+    function computeAccountBalances() {
+      const allRecords = loadRecords();
+      const balances = {};
+      DEFAULT_ACCOUNTS.forEach(a => { balances[a.name] = a.initialBalance; });
+
+      // 從舊到新遍歷
+      const sorted = [...allRecords].reverse();
+      sorted.forEach(r => {
+        const amt = Number(r.amount);
+        if (r.type === 'income') {
+          const acct = r.payment || '現金';
+          if (balances[acct] !== undefined) balances[acct] += amt;
+        } else if (r.type === 'expense') {
+          const acct = r.payment || '現金';
+          if (balances[acct] !== undefined) balances[acct] -= amt;
+        } else if (r.type === 'transfer') {
+          const from = r.fromAccount || '現金';
+          const to = r.toAccount || '現金';
+          if (balances[from] !== undefined) balances[from] -= amt;
+          if (balances[to] !== undefined) balances[to] += amt;
+        }
+      });
+      return balances;
     }
 
     // ═══════════════ 加油回饋計算 ═══════════════ 
@@ -1762,6 +2012,14 @@
       balEl.textContent = (stats.balance >= 0 ? '' : '-') + formatMoney(stats.balance);
       balEl.className = 'stat-value ' + (stats.balance >= 0 ? 'positive' : 'negative');
 
+      // 負額餘額警示
+      const balCard = document.getElementById('balanceCard');
+      if (stats.balance < 0) {
+        balCard.classList.add('negative-balance');
+      } else {
+        balCard.classList.remove('negative-balance');
+      }
+
       const ratioText = stats.totalIncome > 0
         ? `收支比 ${((stats.totalExpense / stats.totalIncome) * 100).toFixed(1)}%`
         : '收支比 —';
@@ -1778,8 +2036,27 @@
       document.getElementById('fuelCount').textContent = fuel.count;
       document.getElementById('fuelPayment').textContent = fuel.topPayment;
 
+      // 帳戶總覽
+      renderAccounts();
+
       // 預警
       renderAlerts(stats);
+    }
+
+    function renderAccounts() {
+      const balances = computeAccountBalances();
+      const grid = document.getElementById('accountsGrid');
+      grid.innerHTML = DEFAULT_ACCOUNTS.map(acct => {
+        const bal = balances[acct.name] || 0;
+        const cls = bal > 0 ? 'positive' : (bal < 0 ? 'negative' : 'zero');
+        const sign = bal < 0 ? '-' : '';
+        return `
+        <div class="account-card">
+          <div class="acc-icon">${acct.icon}</div>
+          <div class="acc-name">${acct.name}</div>
+          <div class="acc-balance ${cls}">${sign}${formatMoney(bal)}</div>
+        </div>`;
+      }).join('');
     }
 
     function renderAlerts(stats) {
@@ -1801,10 +2078,11 @@
       let filtered = records;
       if (activeFilter === 'income') filtered = records.filter(r => r.type === 'income');
       else if (activeFilter === 'expense') filtered = records.filter(r => r.type === 'expense');
+      else if (activeFilter === 'transfer') filtered = records.filter(r => r.type === 'transfer');
       else if (activeFilter === '加油') filtered = records.filter(r => r.category === '加油');
 
       // 按日期排序（最新在上）
-      filtered.sort((a, b) => new Date(b.date) - new Date(a.date) || b.createdAt?.localeCompare(a.createdAt));
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date) || (b.createdAt || '').localeCompare(a.createdAt || ''));
 
       if (filtered.length === 0) {
         list.innerHTML = `
@@ -1815,24 +2093,71 @@
         return;
       }
 
-      list.innerHTML = filtered.map(r => {
-        const icon = CATEGORY_ICONS[r.category] || '📌';
-        const isFuel = r.category === '加油';
-        const amtClass = r.type === 'income' ? 'income' : 'expense';
-        const prefix = r.type === 'income' ? '+' : '-';
-        const hasImage = r.hasImage;
-        return `
+      // 按日期分組
+      const groups = {};
+      filtered.forEach(r => {
+        if (!groups[r.date]) groups[r.date] = [];
+        groups[r.date].push(r);
+      });
+
+      let html = '';
+      Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(date => {
+        const dayRecords = groups[date];
+        const d = new Date(date + 'T00:00:00');
+        const weekday = WEEKDAYS[d.getDay()];
+        const monthDay = `${d.getMonth() + 1}/${d.getDate()}`;
+
+        // 計算當日小計
+        let dayIncome = 0, dayExpense = 0;
+        dayRecords.forEach(r => {
+          const amt = Number(r.amount);
+          if (r.type === 'income') dayIncome += amt;
+          else if (r.type === 'expense') dayExpense += amt;
+        });
+
+        html += `<div class="date-group-header">
+          <div><span class="dg-date">${monthDay}</span><span class="dg-weekday">${weekday}</span></div>
+          <div class="dg-summary">
+            ${dayIncome > 0 ? `<span class="dg-income">+${formatMoney(dayIncome)}</span>` : ''}
+            ${dayExpense > 0 ? `<span class="dg-expense">-${formatMoney(dayExpense)}</span>` : ''}
+          </div>
+        </div>`;
+
+        dayRecords.forEach(r => {
+          html += renderSingleRecord(r);
+        });
+      });
+
+      list.innerHTML = html;
+      loadRecordThumbnails();
+    }
+
+    function renderSingleRecord(r) {
+      const icon = r.type === 'transfer' ? '↔️' : (CATEGORY_ICONS[r.category] || '📌');
+      const isFuel = r.category === '加油';
+      let amtClass, prefix, metaLine;
+
+      if (r.type === 'transfer') {
+        amtClass = 'transfer';
+        prefix = '';
+        metaLine = `${r.fromAccount || '?'} → ${r.toAccount || '?'}`;
+      } else {
+        amtClass = r.type === 'income' ? 'income' : 'expense';
+        prefix = r.type === 'income' ? '+' : '-';
+        metaLine = r.payment || '';
+      }
+      const hasImage = r.hasImage;
+      return `
       <div class="record-item" data-id="${r.id}">
         <div class="record-icon ${amtClass}">${icon}</div>
         <div class="record-info">
           <div class="record-category">
-            ${r.category}
+            ${r.type === 'transfer' ? '轉帳' : r.category}
             ${isFuel ? '<span class="fuel-badge">FUEL</span>' : ''}
             ${hasImage ? '<span class="fuel-badge" style="background:var(--info-dim);color:var(--info-color)">📷</span>' : ''}
           </div>
           <div class="record-meta">
-            <span>${r.date}</span>
-            <span>${r.payment}</span>
+            <span>${metaLine}</span>
           </div>
           ${r.note ? `<div class="record-note">${escapeHtml(r.note)}</div>` : ''}
         </div>
@@ -1840,10 +2165,6 @@
         <div class="record-amount ${amtClass}">${prefix}${formatMoney(r.amount)}</div>
         <button class="record-delete" onclick="handleDelete('${r.id}')" title="刪除">✕</button>
       </div>`;
-      }).join('');
-
-      // 非同步載入縮圖
-      loadRecordThumbnails();
     }
 
     function escapeHtml(str) {
@@ -1940,9 +2261,7 @@
     document.getElementById('recordForm').addEventListener('submit', async e => {
       e.preventDefault();
       const type = document.querySelector('input[name="type"]:checked').value;
-      const category = document.getElementById('category').value;
       const amount = Number(document.getElementById('amount').value);
-      const payment = document.getElementById('payment').value;
       const note = document.getElementById('note').value.trim();
       const date = document.getElementById('date').value;
 
@@ -1951,10 +2270,28 @@
         return;
       }
 
-      const hasImage = !!pendingImageData;
-      const record = addRecord({ type, category, amount, payment, note, date, hasImage });
+      let recordData = { type, amount, note, date };
 
-      // 如果有圖片，存入 IndexedDB
+      if (type === 'transfer') {
+        const fromAccount = document.getElementById('fromAccount').value;
+        const toAccount = document.getElementById('toAccount').value;
+        if (fromAccount === toAccount) {
+          showToast('轉出與轉入帳戶不能相同', 'error');
+          return;
+        }
+        recordData.fromAccount = fromAccount;
+        recordData.toAccount = toAccount;
+        recordData.category = '轉帳';
+        recordData.payment = fromAccount;
+      } else {
+        recordData.category = document.getElementById('category').value;
+        recordData.payment = document.getElementById('payment').value;
+      }
+
+      const hasImage = !!pendingImageData;
+      recordData.hasImage = hasImage;
+      const record = addRecord(recordData);
+
       if (pendingImageData) {
         try {
           await saveImage(record.id, pendingImageData);
@@ -1964,26 +2301,49 @@
         clearPendingImage();
       }
 
-      showToast(`${type === 'income' ? '收入' : '支出'}記錄已新增${hasImage ? '（含單據）' : ''}`, 'success');
+      const typeLabels = { income: '收入', expense: '支出', transfer: '轉帳' };
+      showToast(`${typeLabels[type] || type}記錄已新增${hasImage ? '（含單據）' : ''}`, 'success');
 
-      // 重置表單（保留類型與日期）
       document.getElementById('amount').value = '';
       document.getElementById('note').value = '';
 
       renderAll();
     });
 
-    // 類別切換：根據收入/支出顯示對應類別
+    // ─── 類型切換：收入/支出/轉帳 ─── 
+    function applyTypeToggle(type) {
+      const isIncome = type === 'income';
+      const isTransfer = type === 'transfer';
+
+      // 顯示/隱藏類別選單（轉帳時隱藏）
+      document.getElementById('categoryGroup').style.display = isTransfer ? 'none' : '';
+      document.getElementById('category').required = !isTransfer;
+
+      // 顯示/隱藏轉帳欄位
+      const tFields = document.getElementById('transferFields');
+      tFields.classList.toggle('show', isTransfer);
+
+      // 顯示/隱藏付款方式（轉帳時隱藏）
+      const paymentGroup = document.getElementById('payment').closest('.form-group');
+      if (paymentGroup) paymentGroup.style.display = isTransfer ? 'none' : '';
+
+      if (!isTransfer) {
+        // 動態切換 optgroup 選項（修正 iOS optgroup display:none 不作用的問題）
+        // 注意：optgroup 沒有 .options 屬性，要用 querySelectorAll
+        const expOpts = document.getElementById('expenseCategories').querySelectorAll('option');
+        const incOpts = document.getElementById('incomeCategories').querySelectorAll('option');
+        expOpts.forEach(o => o.disabled = isIncome);
+        incOpts.forEach(o => o.disabled = !isIncome);
+
+        // 自動選到第一個可用選項
+        const allOptions = Array.from(document.getElementById('category').options);
+        const firstValid = allOptions.find(o => !o.disabled && o.value);
+        if (firstValid) document.getElementById('category').value = firstValid.value;
+      }
+    }
+
     document.querySelectorAll('input[name="type"]').forEach(input => {
-      input.addEventListener('change', () => {
-        const isIncome = input.value === 'income';
-        document.getElementById('expenseCategories').style.display = isIncome ? 'none' : '';
-        document.getElementById('incomeCategories').style.display = isIncome ? '' : 'none';
-        // 自動選到第一個可見選項
-        const select = document.getElementById('category');
-        const options = select.querySelectorAll(`optgroup[id="${isIncome ? 'incomeCategories' : 'expenseCategories'}"] option`);
-        if (options.length > 0) select.value = options[0].value;
-      });
+      input.addEventListener('change', () => applyTypeToggle(input.value));
     });
 
     // 篩選器
@@ -2107,8 +2467,19 @@
       const today = new Date().toISOString().slice(0, 10);
       document.getElementById('date').value = today;
 
-      // 預設隱藏收入類別
-      document.getElementById('incomeCategories').style.display = 'none';
+      // 填充轉帳帳戶選單
+      const accountOptions = DEFAULT_ACCOUNTS
+        .map(a => `<option value="${a.name}">${a.icon} ${a.name}</option>`)
+        .join('');
+      document.getElementById('fromAccount').innerHTML = accountOptions;
+      document.getElementById('toAccount').innerHTML = accountOptions;
+      // 預設 toAccount 選第二個，避免和 fromAccount 相同
+      if (DEFAULT_ACCOUNTS.length > 1) {
+        document.getElementById('toAccount').value = DEFAULT_ACCOUNTS[1].name;
+      }
+
+      // 初始化表單狀態（預設選「支出」）
+      applyTypeToggle('expense');
 
       updateMonthLabel();
       renderAll();
